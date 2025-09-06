@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Special Gift</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  height:100vh;
+  font-family:Arial,sans-serif;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  background: linear-gradient(180deg,#001f3f,#0074D9,#7FDBFF,#B0E0E6);
+}
+
+/* Waves */
+.wave{position:absolute; bottom:0; width:200%; height:300px; background: rgba(255,255,255,0.15); border-radius:1000px/300px; animation: waveMove 8s ease-in-out infinite alternate;}
+.wave:nth-child(1){left:-50%; bottom:50px;}
+.wave:nth-child(2){left:-60%; bottom:100px; background: rgba(255,255,255,0.1);}
+.wave:nth-child(3){left:-40%; bottom:150px; background: rgba(255,255,255,0.05);}
+@keyframes waveMove{0%{transform: translateX(0) translateY(0);}50%{transform: translateX(50%) translateY(-20px);}100%{transform: translateX(0) translateY(0);}}
+
+/* Stars */
+.star{position:absolute; border-radius:50%; background:white; opacity:0.8; animation: twinkle calc(2s + var(--rand-speed)) infinite ease-in-out;}
+@keyframes twinkle{0%,100%{opacity:0.2; transform:scale(1) translateY(0);}50%{opacity:1; transform:scale(1.5) translateY(-2px);}}
+
+/* Confetti */
+.confetti{position:absolute; width:10px; height:10px; opacity:0.9; animation: confettiFall linear infinite;}
+@keyframes confettiFall{0%{transform: translateY(0) rotate(0deg);}100%{transform: translateY(100vh) rotate(360deg);}}
+
+/* Fireworks */
+.firework{
+  position:absolute;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:hsl(0,100%,50%);
+  opacity:0.9;
+  animation: fireworkMove 1s linear forwards;
+}
+@keyframes fireworkMove{
+  0%{transform:translate(0,0); opacity:1;}
+  100%{transform:translate(var(--fx), var(--fy)); opacity:0;}
+}
+
+/* Card intro */
+#card-intro{
+  position:absolute;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  font-size:1.5rem;
+  text-align:center;
+  z-index:15;
+  max-width:350px;
+  cursor:pointer;
+  opacity:0;
+  transform: scale(0.3);
+}
+
+/* Here 23 messages letter */
+#here-letter{
+  position:absolute;
+  background:white;
+  padding:20px 25px;
+  border-radius:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  font-size:1.3rem;
+  text-align:center;
+  max-width:300px;
+  z-index:16;
+  opacity:0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition: all 1.5s ease;
+}
+
+/* Press button */
+#press-btn{
+  margin-top:20px;
+  padding:12px 25px;
+  font-size:1.2rem;
+  border:none;
+  border-radius:50px;
+  background:#0074D9;
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+}
+#press-btn:hover{transform:scale(1.1); background:#005fa3;}
+
+/* Game */
+#game{display:none; flex-direction:column; align-items:center; position:relative;}
+.heart-img{width:180px; cursor:pointer; animation: float 3s ease-in-out infinite, heartbeat 1.5s infinite; z-index:10;}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-15px);}100%{transform:translateY(0);} }
+@keyframes heartbeat{0%,100%{transform:scale(1) rotate(0deg);}25%{transform:scale(1.1) rotate(-5deg);}50%{transform:scale(1.2) rotate(5deg);}75%{transform:scale(1.1) rotate(-5deg);} }
+
+/* Message popups animation */
+@keyframes popupIn {
+  0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+  60% { transform: scale(1.1) translateY(-10px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes floatPopup {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(8px, -6px); }
+  50% { transform: translate(-8px, 6px); }
+  75% { transform: translate(6px, -4px); }
+  100% { transform: translate(0px, 0px); }
+}
+.message-popup{
+  position:absolute;
+  background:white;
+  padding:15px 20px;
+  border-radius:12px;
+  font-size:1.2rem;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  max-width:200px;
+  text-align:center;
+  opacity:1;
+  animation: popupIn 0.6s ease forwards, floatPopup 6s ease-in-out infinite;
+}
+
+/* Heart letter button animation */
+#heart-letter{
+  display:none;
+  cursor:pointer;
+  background: linear-gradient(45deg, #ff5f6d, #ffc371);
+  padding:15px 25px;
+  border-radius:50px;
+  box-shadow:0 0 15px rgba(255,95,109,0.7);
+  font-size:1.5rem;
+  text-align:center;
+  z-index:20;
+  position:relative;
+  animation: pulseBtn 1.5s infinite, floatBtn 3s ease-in-out infinite;
+  color: white;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#heart-letter:hover {
+  transform: scale(1.2);
+  box-shadow:0 0 25px rgba(255,95,109,0.9);
+}
+@keyframes pulseBtn{
+  0%,100% { box-shadow: 0 0 15px rgba(255,95,109,0.7); }
+  50% { box-shadow: 0 0 30px rgba(255,95,109,0.9); }
+}
+@keyframes floatBtn{
+  0%{transform: translateY(0);}
+  50%{transform: translateY(-8px);}
+  100%{transform: translateY(0);}
+}
+
+/* Final card */
+#card{
+  display:none;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  font-size:1.5rem;
+  line-height:1.6;
+  text-align:center;
+  animation: popupIn 1s ease forwards;
+}
+</style>
+</head>
+<body>
+
+<div class="wave"></div>
+<div class="wave"></div>
+<div class="wave"></div>
+
+<!-- Card intro -->
+<div id="card-intro">
+  Hello Imane 💖<br>
+  I hope you enjoy this little gift<br>
+  and I hope I chose the right words and song to make you feel special <br><br>
+  <button id="press-btn">Press to see your gift 🎁</button>
+</div>
+
+<!-- Here 23 messages -->
+<div id="here-letter">
+  Here are 23 things that I wanna tell you for your 23rd birthday 💖
+</div>
+
+<!-- Game -->
+<div id="game">
+  <img src="3d37067274f3d692d25ee4afc731fddc-removebg-preview.png" class="heart-img" id="heart-img">
+  <div id="heart-letter">❤ Press Me ❤</div>
+  <div id="card">
+    💖 I hope your birthday reminds you of just how special you are.  <br><br>
+    This year, getting to know you has been amazing,<br><br>
+    and I’m grateful for the warmth, laughter, and light you bring into the lives around you.<br><br>
+    You truly deserve the best today and always 💖<br><br>
+    Happy Birthday! I hope this year brings you all the happiness, laughter, and beautiful moments you deserve. 🎉✨
+  </div>
+</div>
+
+<audio id="bg-music" loop>
+  <source src="Taylor Swift - Daylight (Lyric Video).mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Stars
+for(let i=0;i<50;i++){
+  const star=document.createElement('div');
+  star.className='star';
+  star.style.top=Math.random()*100+'vh';
+  star.style.left=Math.random()*100+'vw';
+  star.style.setProperty('--rand-speed', Math.random()*2+'s');
+  const size=2+Math.random()*4;
+  star.style.width=star.style.height=size+'px';
+  document.body.appendChild(star);
+}
+
+// Confetti
+for(let i=0;i<200;i++){
+  const conf=document.createElement('div');
+  conf.className='confetti';
+  conf.style.background=`hsl(${Math.random()*360},80%,60%)`;
+  conf.style.left=Math.random()*100+'vw';
+  conf.style.top=Math.random()*-100+'px';
+  conf.style.animationDuration=1+Math.random()*3+'s';
+  conf.style.width=5+Math.random()*5+'px';
+  conf.style.height=5+Math.random()*5+'px';
+  document.body.appendChild(conf);
+}
+
+// Fireworks
+function createFirework(x, y){
+  for(let i=0;i<30;i++){
+    const f=document.createElement('div');
+    f.className='firework';
+    f.style.left=x+'px';
+    f.style.top=y+'px';
+    f.style.setProperty('--fx', (Math.random()*400-200)+'px');
+    f.style.setProperty('--fy', (Math.random()*400-200)+'px');
+    f.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    document.body.appendChild(f);
+    setTimeout(()=>f.remove(),1000);
+  }
+}
+
+// Carte intro animée
+const cardIntro=document.getElementById('card-intro');
+const pressBtn=document.getElementById('press-btn');
+const game=document.getElementById('game');
+const hereLetter=document.getElementById('here-letter');
+const heartImg=document.getElementById('heart-img');
+const heartLetter=document.getElementById('heart-letter');
+const card=document.getElementById('card');
+const bgMusic=document.getElementById('bg-music');
+
+function animateCardIntro(){
+  const startX = Math.random()*(window.innerWidth-300);
+  const startY = Math.random()*(window.innerHeight-200);
+  cardIntro.style.left = startX+'px';
+  cardIntro.style.top = startY+'px';
+  cardIntro.style.opacity = 0;
+  cardIntro.style.transform = 'scale(0.3)';
+
+  setTimeout(()=>{ 
+    cardIntro.style.transition = 'all 1.5s ease';
+    cardIntro.style.left = '50%';
+    cardIntro.style.top = '50%';
+    cardIntro.style.transform = 'translate(-50%, -50%) scale(1)';
+    cardIntro.style.opacity = 1;
+    createFirework(window.innerWidth/2, window.innerHeight/2);
+  }, 100);
+}
+animateCardIntro();
+
+// Bouton pour voir le jeu / lettre Here
+pressBtn.addEventListener('click', ()=>{
+  cardIntro.style.display='none';
+  hereLetter.style.opacity=1;
+  hereLetter.style.left='50%';
+  hereLetter.style.top='30%';
+  hereLetter.style.transform='translate(-50%, -50%) scale(1)';
+  
+  bgMusic.play().catch(e=>console.log("Autoplay blocked"));
+
+  // Après 5s, faire disparaitre la lettre et montrer le coeur
+  setTimeout(()=>{
+    hereLetter.style.transition='all 1.5s ease';
+    hereLetter.style.opacity=0;
+    setTimeout(()=>{
+      hereLetter.style.display='none';
+      game.style.display='flex';
+    },1500);
+  },5000);
+});
+
+// Popups du jeu
+const messages=[
+  "Another year hotter, smarter, and even more unforgettable","I appreciate you just for being you.","I love how genuine you are.","You’re someone I deeply respect.",
+  "You are loved more than you know.","You leave a mark on hearts without even trying.","I’m glad I got the chance to know you.","You are someone worth noticing, always.❤️",
+  "I love how easy it is to talk to you.","You’re someone worth holding close in thought.","You're amazing","You make people feel safe and seen.",
+  "You're unique","You have a light that touches those around you.","You matter in ways you can’t even imagine.","Thank you for listening, even when I don’t make sense",
+  "Thank you for sharing your energy and warmth with me.","Thank you for reminding me what genuine connection feels like.","You are enough, just as you are.","You are a rare soul who deserves to be celebrated 🌷",
+  "You are bold, bright, and totally unforgettable.","You are the definition of “damn, yes.”","You are a story worth telling."
+];
+
+let msgCount=0;
+let popups=[];
+
+heartImg.addEventListener('click', ()=>{
+  if(msgCount >= messages.length){
+    popups.forEach(p=>{
+      p.style.transition='all 1s ease';
+      p.style.left='50%';
+      p.style.top='50%';
+      p.style.transform='translate(-50%, -50%) scale(0.3)';
+      p.style.opacity='0';
+    });
+    setTimeout(()=>{popups.forEach(p=>p.remove()); heartLetter.style.display='block';},1000);
+    return;
+  }
+
+  const popup=document.createElement('div');
+  popup.className='message-popup';
+  popup.innerHTML=messages[msgCount];
+
+  const startX=Math.random()*(window.innerWidth-200)+50;
+  const startY=Math.random()*(window.innerHeight-200)+50;
+  popup.style.left=startX+'px';
+  popup.style.top=startY+'px';
+
+  const dx=(Math.random()*200-100);
+  const dy=(Math.random()*200-100);
+  setTimeout(()=>{popup.style.transform=`translate(${dx}px, ${dy}px)`;},50);
+
+  document.body.appendChild(popup);
+  popups.push(popup);
+
+  msgCount++;
+});
+
+// Heart letter click
+heartLetter.addEventListener('click', ()=>{
+  heartLetter.style.display='none';
+  card.style.display='block';
+
+  // Petit effet de confetti supplémentaire
+  for(let i=0;i<50;i++){
+    const conf=document.createElement('div');
+    conf.className='confetti';
+    conf.style.background=`hsl(${Math.random()*360},80%,70%)`;
+    conf.style.left=Math.random()*100+'vw';
+    conf.style.top=Math.random()*-50+'px';
+    conf.style.animationDuration=2+Math.random()*2+'s';
+    conf.style.width=5+Math.random()*5+'px';
+    conf.style.height=5+Math.random()*5+'px';
+    document.body.appendChild(conf);
+  }
+});
+</script>
+</body>
+</html>
